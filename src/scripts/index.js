@@ -43,7 +43,6 @@ const addButton = document.querySelector('.profile__add-button');
 const cardImage = document.querySelectorAll('.card__image');
 const popUpTypeImage = document.querySelector('.popup_type_image');
 
-
 cardImage.forEach(element => {
   element.addEventListener('click', () => {
     popUpTypeImage.style.display = 'flex';
@@ -54,11 +53,17 @@ cardImage.forEach(element => {
 })
 
 editButton.addEventListener('click', openPopUp);
-addButton.addEventListener('click', openPopUp);
+addButton.addEventListener('click', openNewCard);
 function openPopUp () {
   const popUp = document.querySelector('.popup');
   popUp.style.display = 'flex';
   popUp.classList.add('popup_opened');
+}
+
+function openNewCard () {
+  const popUpNewCard = document.querySelector('.popup_type_new-card');
+  popUpNewCard.style.display = 'flex';
+  popUpNewCard.classList.add('popup_opened');
 }
 
 function closePopUp () {
@@ -66,6 +71,9 @@ function closePopUp () {
   popUp.style.display = 'none';
   popUpTypeImage.style.display = 'none'
   popUp.classList.remove('popup_opened');
+  const popUpNewCard = document.querySelector('.popup_type_new-card');
+  popUpNewCard.style.display = 'none';
+  popUpNewCard.classList.remove('popup_opened');
 }
 
 function closePopupEsc(evt) {
@@ -89,3 +97,22 @@ window.addEventListener('click', e => {
 })
 
 window.addEventListener ('keydown', closePopupEsc)
+
+const formElement = document.querySelector('.popup__form')
+const nameInput = document.querySelector('.popup__input_type_name')
+const jobInput = document.querySelector('.popup__input_type_description')
+
+function handleFormSubmit(evt) {
+  evt.preventDefault();
+  const name = nameInput.value
+  const job = jobInput.value
+
+  const profileTitle = document.querySelector('.profile__title');
+  const profileDescription = document.querySelector('.profile__description');
+
+  profileTitle.textContent = name;
+  profileDescription.textContent = job;
+  closePopUp();
+}
+
+formElement.addEventListener('submit', handleFormSubmit);
