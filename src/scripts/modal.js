@@ -31,4 +31,4 @@ const closeByOverlayClick = (e) => {
   }
 }
 
-export { openPopUp, closePopupEsc, closePopUp };
+export { openPopUp, closePopUp };
