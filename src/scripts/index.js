@@ -13,18 +13,28 @@ const renderCards = (cardElement) => {
 
 const popUpTypeImage = document.querySelector('.popup_type_image');
 
+const openImagePopUp = (event) => {
+  openPopUp(popUpTypeImage);
+
+  popUpTypeImage.querySelector('.popup__image').src = event.target.closest('.card__image').src;
+  popUpTypeImage.querySelector('.popup__caption').textContent = event.target.closest('.card__image').alt;
+  popUpTypeImage.querySelector('.popup__image').alt = event.target.closest('.card__image').alt;
+}
+
 const createUserCard = (evt) => {
   evt.preventDefault();
   const name = cardName.value;
   const link = cardLink.value;
   const card = { name, link };
+  cardName.value = '';
+  cardLink.value = '';
 
-  placesList.prepend(createCard(card, deleteCard, likeCard, () => openPopUp(popUpTypeImage)));
+  placesList.prepend(createCard(card, deleteCard, likeCard, openImagePopUp));
   closePopUp();
 }
 
 initialCards.forEach((card) => {
-  renderCards(createCard(card, deleteCard, likeCard, () => openPopUp(popUpTypeImage)));
+  renderCards(createCard(card, deleteCard, likeCard, openImagePopUp));
 });
 
 const buttonOpenEditProfilePopup = document.querySelector('.profile__edit-button');
@@ -32,13 +42,11 @@ const buttonsClosePopup = document.querySelectorAll('.popup__close');
 const buttonOpenAddCardPopup = document.querySelector('.profile__add-button');
 const popups = document.querySelectorAll('.popup');
 
-
 popups.forEach(el => el.classList.add('popup_is-animated'));
 
 buttonsClosePopup.forEach(element => {
-  element.addEventListener('click', closePopUp);
+  element.addEventListener('click', () => popups.forEach(el => closePopUp(el)));
 })
-
 
 const formEditProfile = document.querySelector('.popup__form');
 const formCardElement = document.querySelector('.popup_type_new-card .popup__form');
@@ -48,7 +56,15 @@ const profileTitle = document.querySelector('.profile__title');
 const profileDescription = document.querySelector('.profile__description');
 const popUpNewCard = document.querySelector('.popup_type_new-card');
 const popUpEditType = document.querySelector('.popup_type_edit');
-buttonOpenEditProfilePopup.addEventListener('click', () => openPopUp(popUpEditType));
+
+const openEditProfilePopup = () => {
+  openPopUp(popUpEditType);
+
+  nameInput.value = profileTitle.textContent;
+  jobInput.value = profileDescription.textContent;
+}
+
+buttonOpenEditProfilePopup.addEventListener('click', openEditProfilePopup);
 buttonOpenAddCardPopup.addEventListener('click', () => openPopUp(popUpNewCard));
 
 const submitEditProfileForm = (evt) => {
