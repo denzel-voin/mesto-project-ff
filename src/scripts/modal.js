@@ -11,16 +11,18 @@ const closePopUp = (element) => {
 }
 
 const closePopupEsc = (evt) => {
-  const popUpIsOpened = document.querySelector('.popup_is-opened');
-  if (popUpIsOpened && evt.key === 'Escape') {
-    closePopUp(popUpIsOpened);
+  if (evt.key === 'Escape') {
+    const popUpIsOpened = document.querySelector('.popup_is-opened');
+    if (popUpIsOpened) {
+      closePopUp(popUpIsOpened);
+    }
   }
 }
 
 const closeByOverlayClick = (e) => {
-  const popUpIsOpened = document.querySelector('.popup_is-opened');
   const target = e.target
   if (target.closest('.popup') && !target.closest('.popup__content')) {
+    const popUpIsOpened = document.querySelector('.popup_is-opened');
     closePopUp(popUpIsOpened);
   }
 }
