@@ -19,6 +19,8 @@ const profileTitle = document.querySelector('.profile__title');
 const profileDescription = document.querySelector('.profile__description');
 const popUpNewCard = document.querySelector('.popup_type_new-card');
 const popUpEditType = document.querySelector('.popup_type_edit');
+const popUpImage = popUpTypeImage.querySelector('.popup__image');
+const popUpCaption = popUpTypeImage.querySelector('.popup__caption');
 
 const renderCards = (cardElement) => {
   placesList.append(cardElement);
@@ -27,9 +29,9 @@ const renderCards = (cardElement) => {
 const openImagePopUp = (event) => {
   openPopUp(popUpTypeImage);
 
-  popUpTypeImage.querySelector('.popup__image').src = event.target.closest('.card__image').src;
-  popUpTypeImage.querySelector('.popup__caption').textContent = event.target.closest('.card__image').alt;
-  popUpTypeImage.querySelector('.popup__image').alt = event.target.closest('.card__image').alt;
+  popUpImage.src = event.target.closest('.card__image').src;
+  popUpCaption.textContent = event.target.closest('.card__image').alt;
+  popUpImage.alt = event.target.closest('.card__image').alt;
 }
 
 const createUserCard = (evt) => {
