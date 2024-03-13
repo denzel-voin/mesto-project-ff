@@ -15,7 +15,8 @@
   <main class="content">
     <section class="profile page__section">
       <div class="profile__image">
-        <img src="<%= require('./images/avatar.jpg') %>" alt="Аватар пользователя" class="profile__image">
+        <img src="<%= require('./images/avatar.jpg') %>" alt="Аватар пользователя" class="profile__image profile__avatar">
+        <button type="button" class="profile__image-edit-button"></button>
       </div>
       <div class="profile__info">
         <h1 class="profile__title">Жак-Ив Кусто</h1>
@@ -83,6 +84,17 @@
         <span class="input__place-name-error input-error"></span>
         <input type="url" id="input__link" name="link" class="popup__input popup__input_type_url" placeholder="Ссылка на картинку" required>
         <span class="input__link-error input-error"></span>
+        <button type="submit" class="button popup__button">Сохранить</button>
+      </form>
+    </div>
+  </div>
+  <div class="popup popup_type_edit-avatar">
+    <div class="popup__content">
+      <button type="button" class="popup__close"></button>
+      <h3 class="popup__title">Обновить аватар</h3>
+      <form class="popup__form" name="new-place" novalidate>
+        <input type="url" id="input__avatar-link" name="link" class="popup__input popup__input_type_url" placeholder="Ссылка на картинку" required>
+        <span class="input__avatar-link-error input-error"></span>
         <button type="submit" class="button popup__button">Сохранить</button>
       </form>
     </div>

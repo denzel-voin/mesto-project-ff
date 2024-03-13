@@ -2,6 +2,7 @@ import '../pages/index.css';
 import { createCard, likeCard, deleteCard } from './card';
 import { openPopUp, closePopUp } from './modal';
 import { enableValidation } from "./validation";
+import {getInitialCards, getProfile, patchAvatar, patchProfile, postNewCard} from "./api";
 
 const placesList = document.querySelector('.places__list');
 const cardName = document.querySelector('.popup__input_type_card-name');
@@ -12,6 +13,7 @@ const buttonsClosePopup = document.querySelectorAll('.popup__close');
 const buttonOpenAddCardPopup = document.querySelector('.profile__add-button');
 const popups = document.querySelectorAll('.popup');
 const formEditProfile = document.querySelector('.popup__form');
+const formEditAvatar = document.querySelector('.popup_type_edit-avatar');
 const formCardElement = document.querySelector('.popup_type_new-card .popup__form');
 const nameInput = document.querySelector('.popup__input_type_name');
 const jobInput = document.querySelector('.popup__input_type_description');
@@ -22,13 +24,15 @@ const popUpEditType = document.querySelector('.popup_type_edit');
 const popUpImage = popUpTypeImage.querySelector('.popup__image');
 const popUpCaption = popUpTypeImage.querySelector('.popup__caption');
 const initialCards = [];
-fetch('https://nomoreparties.co/v1/cohort-magistr-2/cards', {
-  method: 'GET',
-  headers: {
-    authorization: '9170d58a-0512-40e6-96dd-ff17859c3ccb'
-  }
-})
-  .then(res => res.json())
+
+getInitialCards()
+  .then(res => {
+    if(res.ok) {
+      return res.json();
+    } else {
+      return Promise.reject(`Ошибка: ${res.status}`);
+    }
+  })
   .then((result) => {
     result.forEach(el => {
       initialCards.push({ name: el.name, link: el.link, likes: el.likes, owner: el.owner.name, id: el._id });
@@ -36,27 +40,14 @@ fetch('https://nomoreparties.co/v1/cohort-magistr-2/cards', {
     initialCards.forEach((card) => {
       renderCards(createCard(card, deleteCard, likeCard, openImagePopUp));
     });
+  })
+  .catch((err) => {
+    console.log('Ошибка:', err);
   });
 
+getProfile();
 
-fetch('https://nomoreparties.co/v1/cohort-magistr-2/users/me', {
-  method: 'GET',
-  headers: {
-    authorization: '9170d58a-0512-40e6-96dd-ff17859c3ccb'
-  }
-})
-  .then(res => res.json())
-  .then((result) => {
-    const avatar = document.querySelector('.profile__image');
-    const profileName = document.querySelector('.profile__title');
-    const profileDescription = document.querySelector(('.profile__description'));
-    profileDescription.textContent = result.about;
-    profileName.textContent = result.name;
-    avatar.src = result.avatar;
-  });
-
-
-const renderCards = (cardElement) => {
+function renderCards (cardElement) {
   placesList.append(cardElement);
 }
 
@@ -79,18 +70,9 @@ const createUserCard = (evt) => {
   const buttonElement = formCardElement.querySelector('.popup__button');
   buttonElement.disabled = true;
   buttonElement.classList.add('form__submit_inactive');
-  fetch('https://nomoreparties.co/v1/cohort-magistr-2/cards', {
-    method: 'POST',
-    headers: {
-      authorization: '9170d58a-0512-40e6-96dd-ff17859c3ccb',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      name: `${name}`,
-      link: `${link}`,
-      likes: []
-    })
-  })
+  renderLoading(true, buttonElement);
+  postNewCard(name, link)
+    .finally(() => renderLoading(false, buttonElement));
   placesList.prepend(createCard(card, deleteCard, likeCard, openImagePopUp));
   closePopUp(popUpNewCard);
 }
@@ -122,18 +104,13 @@ const submitEditProfileForm = (evt) => {
   const job = jobInput.value;
   profileTitle.textContent = name;
   profileDescription.textContent = job;
+  const buttonElement = formEditProfile.querySelector('.popup__button');
+  buttonElement.disabled = true;
+  buttonElement.classList.add('form__submit_inactive');
+  renderLoading(true, buttonElement);
   closePopUp(popUpEditType);
-  fetch('https://nomoreparties.co/v1/cohort-magistr-2/users/me', {
-    method: 'PATCH',
-    headers: {
-      authorization: '9170d58a-0512-40e6-96dd-ff17859c3ccb',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      name: `${name}`,
-      about: `${job}`
-    })
-  })
+  patchProfile(name, job)
+    .finally(() => renderLoading(false, buttonElement));
 }
 
 popups.forEach(el => el.classList.add('popup_is-animated'));
@@ -148,4 +125,55 @@ buttonOpenAddCardPopup.addEventListener('click', () => openPopUp(popUpNewCard));
 formEditProfile.addEventListener('submit', submitEditProfileForm);
 formCardElement.addEventListener('submit', createUserCard);
 
+
+const buttonEditAvatar = document.querySelector('.profile__image-edit-button');
+const popUpEditAvatar = document.querySelector('.popup_type_edit-avatar');
+
+const openEditAvatarPopup = () => {
+  openPopUp(popUpEditAvatar);
+
+
+  const errorElement = popUpEditAvatar.querySelectorAll(`.form__input-error_active`);
+  if (errorElement) {
+    errorElement.forEach(el =>{
+      el.textContent = '';
+      el.classList.remove('form__input-error_active');
+    })
+    const inputError = popUpEditAvatar.querySelectorAll(`.form__input_type_error`);
+    if (inputError) {
+      inputError.forEach(el => {
+        el.classList.remove('form__input_type_error');
+      })
+    }
+  }
+}
+
+buttonEditAvatar.addEventListener('click', openEditAvatarPopup);
+
+
+const submitEditAvatarForm = (evt) => {
+  evt.preventDefault();
+  const avatar = document.querySelector('.profile__avatar');
+  const avatarUrl = document.querySelector('#input__avatar-link');
+  avatar.src = avatarUrl.value;
+  avatarUrl.value = '';
+  const buttonElement = popUpEditAvatar.querySelector('.popup__button');
+  buttonElement.disabled = true;
+  buttonElement.classList.add('form__submit_inactive');
+  renderLoading(true, buttonElement);
+  patchAvatar()
+    .finally(() => renderLoading(false, buttonElement))
+  closePopUp(popUpEditAvatar);
+}
+
+formEditAvatar.addEventListener('submit', submitEditAvatarForm);
+
 enableValidation();
+
+function renderLoading (isLoading, button) {
+  if (isLoading) {
+    button.textContent = 'Сохранение...'
+  } else {
+    button.textContent = 'Сохранить'
+  }
+}

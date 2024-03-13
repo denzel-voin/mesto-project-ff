@@ -1,9 +1,11 @@
+import {deleteCardRequest, likeRequest} from "./api";
+
 const cardTemplate = document.querySelector('#card-template').content;
 const createCard = (cards, callBackDeleteCard, callBackLikeCard, openCard) => {
   const cardElement = cardTemplate.querySelector('.card').cloneNode(true);
   cardElement.id = cards.id;
   const cardImage = cardElement.querySelector('.card__image');
-  const cardLikeNumber = cardTemplate.querySelector('.card__like-number');
+  const cardLikeNumber = cardElement.querySelector('.card__like-number');
   cardLikeNumber.textContent = cards.likes.length;
   cardImage.src = cards.link;
   cardImage.alt = `${cards.name}`;
@@ -32,31 +34,12 @@ const likeCard = (event) => {
   const activeLike = event.target.closest('.card__like-button_is-active');
   const card = event.target.closest('.card');
   const likeNumber = card.querySelector('.card__like-number');
-  fetch(`https://nomoreparties.co/v1/cohort-magistr-2/cards/likes/${card.id}`, {
-    method: activeLike ? 'PUT' : 'DELETE',
-    headers: {
-      authorization: '9170d58a-0512-40e6-96dd-ff17859c3ccb'
-    }
-  })
-    .then(res => res.json())
-    .then((result) => {
-      likeNumber.textContent = result.likes.length;
-    })
-    .catch(error => {
-      likeButton.classList.toggle('card__like-button_is-active');
-      console.error('Error:', error);
-    });
+  likeRequest(activeLike, card, likeNumber, likeButton);
 }
-
 
 const deleteCard = (event) => {
   const card = event.target.closest('.card');
-  fetch(`https://nomoreparties.co/v1/cohort-magistr-2/cards/${card.id}`, {
-    method: 'DELETE',
-    headers: {
-      authorization: '9170d58a-0512-40e6-96dd-ff17859c3ccb'
-    }
-  })
+  deleteCardRequest(card);
   card.remove();
 }
 
