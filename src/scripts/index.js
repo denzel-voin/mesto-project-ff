@@ -2,7 +2,7 @@ import '../pages/index.css';
 import { createCard, likeCard, deleteCard } from './card';
 import { openPopUp, closePopUp } from './modal';
 import { enableValidation } from "./validation";
-import {getInitialCards, getProfile, patchAvatar, patchProfile, postNewCard} from "./api";
+import {getInitialCards, getProfile, patchAvatar, patchProfile, postNewCard, checkResponse} from "./api";
 
 const placesList = document.querySelector('.places__list');
 const cardName = document.querySelector('.popup__input_type_card-name');
@@ -27,25 +27,35 @@ const initialCards = [];
 
 getInitialCards()
   .then(res => {
-    if(res.ok) {
-      return res.json();
-    } else {
-      return Promise.reject(`Ошибка: ${res.status}`);
-    }
-  })
-  .then((result) => {
-    result.forEach(el => {
-      initialCards.push({ name: el.name, link: el.link, likes: el.likes, owner: el.owner.name, id: el._id });
-    });
-    initialCards.forEach((card) => {
-      renderCards(createCard(card, deleteCard, likeCard, openImagePopUp));
-    });
+    checkResponse(res)
+      .then((result) => {
+        result.forEach(el => {
+          initialCards.push({ name: el.name, link: el.link, likes: el.likes, owner: el.owner.name, id: el._id });
+        });
+        initialCards.forEach((card) => {
+          renderCards(createCard(card, deleteCard, likeCard, openImagePopUp));
+        });
+      })
   })
   .catch((err) => {
     console.log('Ошибка:', err);
   });
 
-getProfile();
+getProfile()
+  .then(res => {
+    checkResponse(res)
+      .then((result) => {
+        const avatar = document.querySelector('.profile__avatar');
+        const profileName = document.querySelector('.profile__title');
+        const profileDescription = document.querySelector(('.profile__description'));
+        profileDescription.textContent = result.about;
+        profileName.textContent = result.name;
+        avatar.src = result.avatar;
+      })
+  })
+  .catch(error => {
+    console.error('Ошибка: ', error);
+  });
 
 function renderCards (cardElement) {
   placesList.append(cardElement);
@@ -72,8 +82,18 @@ const createUserCard = (evt) => {
   buttonElement.classList.add('form__submit_inactive');
   renderLoading(true, buttonElement);
   postNewCard(name, link)
+    .then(res => {
+      checkResponse(res)
+        .then(result => {
+          card.id = result._id;
+          const createdCard = createCard(card, deleteCard, likeCard, openImagePopUp);
+          placesList.prepend(createdCard);
+        });
+    })
+    .catch(error => {
+      console.error('Ошибка: ', error);
+    })
     .finally(() => renderLoading(false, buttonElement));
-  placesList.prepend(createCard(card, deleteCard, likeCard, openImagePopUp));
   closePopUp(popUpNewCard);
 }
 
@@ -110,6 +130,12 @@ const submitEditProfileForm = (evt) => {
   renderLoading(true, buttonElement);
   closePopUp(popUpEditType);
   patchProfile(name, job)
+    .then(res => {
+      checkResponse(res);
+    })
+    .catch(error => {
+      console.error('Ошибка: ', error);
+    })
     .finally(() => renderLoading(false, buttonElement));
 }
 
@@ -161,7 +187,13 @@ const submitEditAvatarForm = (evt) => {
   buttonElement.disabled = true;
   buttonElement.classList.add('form__submit_inactive');
   renderLoading(true, buttonElement);
-  patchAvatar()
+  patchAvatar(avatar)
+    .then(res => {
+      checkResponse(res);
+    })
+    .catch(error => {
+      console.error('Ошибка: ', error);
+    })
     .finally(() => renderLoading(false, buttonElement))
   closePopUp(popUpEditAvatar);
 }

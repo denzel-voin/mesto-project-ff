@@ -1,4 +1,4 @@
-import {deleteCardRequest, likeRequest} from "./api";
+import {checkResponse, deleteCardRequest, likeRequest} from "./api";
 
 const cardTemplate = document.querySelector('#card-template').content;
 const createCard = (cards, callBackDeleteCard, callBackLikeCard, openCard) => {
@@ -21,12 +21,14 @@ const createCard = (cards, callBackDeleteCard, callBackLikeCard, openCard) => {
     const deleteButton = document.createElement('button');
     deleteButton.classList.add('card__delete-button');
     cardElement.appendChild(deleteButton);
-    cardElement.querySelector('.card__delete-button').addEventListener('click', callBackDeleteCard);
+    deleteButton.addEventListener('click', callBackDeleteCard); // Move inside this block
   }
-  cardElement.querySelector('.card__like-button').addEventListener('click', callBackLikeCard);
+  const likeButton = cardElement.querySelector('.card__like-button');
+  likeButton.addEventListener('click', callBackLikeCard); // Move here
   cardImage.addEventListener('click', openCard);
   return cardElement
 }
+
 
 const likeCard = (event) => {
   const likeButton = event.target.closest('.card__like-button');
@@ -34,12 +36,29 @@ const likeCard = (event) => {
   const activeLike = event.target.closest('.card__like-button_is-active');
   const card = event.target.closest('.card');
   const likeNumber = card.querySelector('.card__like-number');
-  likeRequest(activeLike, card, likeNumber, likeButton);
+  likeRequest(activeLike, card, likeNumber, likeButton)
+    .then(res => {
+      checkResponse(res)
+        .then((result) => {
+          console.log(result)
+          likeNumber.textContent = result.likes.length;
+        })
+    })
+    .catch(error => {
+      likeButton.classList.toggle('card__like-button_is-active');
+      console.error('Ошибка: ', error);
+    });
 }
 
 const deleteCard = (event) => {
   const card = event.target.closest('.card');
-  deleteCardRequest(card);
+  deleteCardRequest(card)
+    .then(res => {
+      checkResponse(res);
+    })
+    .catch(error => {
+      console.error('Ошибка: ', error);
+    });
   card.remove();
 }
 

@@ -18,24 +18,6 @@ const getProfile = () => {
     method: 'GET',
     headers: config.headers
   })
-    .then(res => {
-      if(res.ok) {
-        return res.json();
-      } else {
-        return Promise.reject(`Ошибка: ${res.status}`);
-      }
-    })
-    .then((result) => {
-      const avatar = document.querySelector('.profile__avatar');
-      const profileName = document.querySelector('.profile__title');
-      const profileDescription = document.querySelector(('.profile__description'));
-      profileDescription.textContent = result.about;
-      profileName.textContent = result.name;
-      avatar.src = result.avatar;
-    })
-    .catch(error => {
-      console.error('Ошибка: ', error);
-    });
 }
 
 const postNewCard = (name, link) => {
@@ -44,20 +26,9 @@ const postNewCard = (name, link) => {
     headers: config.headers,
     body: JSON.stringify({
       name: `${name}`,
-      link: `${link}`,
-      likes: []
+      link: `${link}`
     })
   })
-    .then(res => {
-      if(res.ok) {
-        return res.json();
-      } else {
-        return Promise.reject(`Ошибка: ${res.status}`);
-      }
-    })
-    .catch(error => {
-      console.error('Ошибка: ', error);
-    });
 }
 
 const patchProfile = (name, job) => {
@@ -69,16 +40,6 @@ const patchProfile = (name, job) => {
       about: `${job}`
     })
   })
-    .then(res => {
-      if(res.ok) {
-        return res.json();
-      } else {
-        return Promise.reject(`Ошибка: ${res.status}`);
-      }
-    })
-    .catch(error => {
-      console.error('Ошибка: ', error);
-    });
 }
 
 const patchAvatar = (avatar) => {
@@ -89,37 +50,13 @@ const patchAvatar = (avatar) => {
       avatar: avatar.src
     })
   })
-    .then(res => {
-      if(res.ok) {
-        return res.json();
-      } else {
-        return Promise.reject(`Ошибка: ${res.status}`);
-      }
-    })
-    .catch(error => {
-      console.error('Ошибка: ', error);
-    });
 }
 
-const likeRequest = (activeLike, card, likeNumber, likeButton) => {
+const likeRequest = (activeLike, card) => {
   return fetch(`${config.baseUrl}/cards/likes/${card.id}`, {
     method: activeLike ? 'PUT' : 'DELETE',
     headers: config.headers
   })
-    .then(res => {
-      if(res.ok) {
-        return res.json();
-      } else {
-        return Promise.reject(`Ошибка: ${res.status}`);
-      }
-    })
-    .then((result) => {
-      likeNumber.textContent = result.likes.length;
-    })
-    .catch(error => {
-      likeButton.classList.toggle('card__like-button_is-active');
-      console.error('Ошибка: ', error);
-    });
 }
 
 const deleteCardRequest = (card) => {
@@ -127,16 +64,14 @@ const deleteCardRequest = (card) => {
     method: 'DELETE',
     headers: config.headers
   })
-    .then(res => {
-      if(res.ok) {
-        return res.json();
-      } else {
-        return Promise.reject(`Ошибка: ${res.status}`);
-      }
-    })
-    .catch(error => {
-      console.error('Ошибка: ', error);
-    });
 }
 
-export {getInitialCards, getProfile, postNewCard, patchProfile, patchAvatar, likeRequest, deleteCardRequest}
+const checkResponse = (res) => {
+  if(res.ok) {
+    return res.json();
+  } else {
+    return Promise.reject(`Ошибка: ${res.status}`);
+  }
+}
+
+export {getInitialCards, getProfile, postNewCard, patchProfile, patchAvatar, likeRequest, deleteCardRequest, checkResponse}
