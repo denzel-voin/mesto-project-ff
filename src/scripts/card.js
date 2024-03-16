@@ -40,7 +40,6 @@ const likeCard = (event) => {
     .then(res => {
       checkResponse(res)
         .then((result) => {
-          console.log(result)
           likeNumber.textContent = result.likes.length;
         })
     })
