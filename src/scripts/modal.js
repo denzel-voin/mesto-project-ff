@@ -20,11 +20,12 @@ const closePopupEsc = (evt) => {
 }
 
 const closeByOverlayClick = (e) => {
-  const target = e.target
-  if (target.closest('.popup') && !target.closest('.popup__content')) {
-    const popUpIsOpened = document.querySelector('.popup_is-opened');
-    closePopUp(popUpIsOpened);
+  const target = e.target;
+  if (target.classList.contains("popup_is-opened")) {
+    closePopUp(target);
   }
-}
+};
+
+
 
 export { openPopUp, closePopUp };

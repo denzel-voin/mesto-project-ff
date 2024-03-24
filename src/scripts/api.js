@@ -6,11 +6,20 @@ const config = {
   }
 }
 
+const checkResponse = (res) => {
+  if(res.ok) {
+    return res.json();
+  } else {
+    return Promise.reject(`Ошибка: ${res.status}`);
+  }
+}
+
 const getInitialCards = () => {
   return fetch(`${config.baseUrl}/cards`, {
     method: 'GET',
     headers: config.headers
   })
+    .then(res => checkResponse(res));
 }
 
 const getProfile = () => {
@@ -18,6 +27,7 @@ const getProfile = () => {
     method: 'GET',
     headers: config.headers
   })
+    .then(res => checkResponse(res));
 }
 
 const postNewCard = (name, link) => {
@@ -29,6 +39,7 @@ const postNewCard = (name, link) => {
       link: `${link}`
     })
   })
+    .then(res => checkResponse(res));
 }
 
 const patchProfile = (name, job) => {
@@ -40,23 +51,26 @@ const patchProfile = (name, job) => {
       about: `${job}`
     })
   })
+    .then(res => checkResponse(res));
 }
 
-const patchAvatar = (avatar) => {
+const patchAvatar = (url) => {
   return fetch(`${config.baseUrl}/users/me/avatar`, {
     method: 'PATCH',
     headers: config.headers,
     body: JSON.stringify({
-      avatar: avatar.src
+      avatar: url
     })
   })
+    .then(res => checkResponse(res));
 }
 
 const likeRequest = (activeLike, card) => {
   return fetch(`${config.baseUrl}/cards/likes/${card.id}`, {
-    method: activeLike ? 'PUT' : 'DELETE',
+    method: activeLike ? 'DELETE' : 'PUT',
     headers: config.headers
   })
+    .then(res => checkResponse(res));
 }
 
 const deleteCardRequest = (card) => {
@@ -64,14 +78,7 @@ const deleteCardRequest = (card) => {
     method: 'DELETE',
     headers: config.headers
   })
+    .then(res => checkResponse(res));
 }
 
-const checkResponse = (res) => {
-  if(res.ok) {
-    return res.json();
-  } else {
-    return Promise.reject(`Ошибка: ${res.status}`);
-  }
-}
-
-export {getInitialCards, getProfile, postNewCard, patchProfile, patchAvatar, likeRequest, deleteCardRequest, checkResponse}
+export {getInitialCards, getProfile, postNewCard, patchProfile, patchAvatar, likeRequest, deleteCardRequest}
