@@ -67,24 +67,10 @@ const enableValidation = (settings) => {
 };
 
 const clearValidation = (formElement, settings) => {
-  const errorElement = formElement.querySelectorAll(`.${settings.errorClass}`);
-  const input = formElement.querySelectorAll(settings.inputSelector);
-  const inputError = formElement.querySelectorAll(`.${settings.inputErrorClass}`);
-
-  if (errorElement) {
-    input.forEach(el => {
-      el.value = '';
-    })
-    errorElement.forEach(el => {
-      el.textContent = '';
-      el.classList.remove(settings.errorClass);
-    })
-    inputError.forEach(el => {
-      el.classList.remove(settings.inputErrorClass);
-    })
-  }
-
-
+  const inputs = formElement.querySelectorAll(settings.inputSelector);
+  inputs.forEach(input => {
+    hideInputError(formElement, input, settings)
+  })
 }
 
 export { enableValidation, clearValidation }

@@ -6,6 +6,7 @@ const createCard = (cardParams) => {
 
   const cardElement = cardTemplate.querySelector('.card').cloneNode(true);
   cardElement.id = cardParams.card.id;
+  const likeButton = cardElement.querySelector('.card__like-button');
   const cardImage = cardElement.querySelector('.card__image');
   const cardLikeNumber = cardElement.querySelector('.card__like-number');
   cardLikeNumber.textContent = cardParams.card.likes.length;
@@ -15,7 +16,6 @@ const createCard = (cardParams) => {
 
   cardParams.card.likes.forEach(el => {
     if (el._id === cardParams.userId) {
-      const likeButton = cardElement.querySelector('.card__like-button');
       likeButton.classList.add('card__like-button_is-active');
     }
   });
@@ -26,7 +26,6 @@ const createCard = (cardParams) => {
     deleteButton.addEventListener('click', cardParams.callBackDeleteCard);
   }
 
-  const likeButton = cardElement.querySelector('.card__like-button');
   likeButton.addEventListener('click', cardParams.callBackLikeCard);
   cardImage.addEventListener('click', cardParams.openCard);
 
@@ -39,7 +38,7 @@ const likeCard = (event) => {
   const activeLike = event.target.closest('.card__like-button_is-active');
   const card = event.target.closest('.card');
   const likeNumber = card.querySelector('.card__like-number');
-  likeRequest(activeLike, card, likeNumber, likeButton)
+  likeRequest(activeLike, card)
     .then((result) => {
       likeNumber.textContent = result.likes.length;
       likeButton.classList.toggle('card__like-button_is-active');
@@ -49,7 +48,7 @@ const likeCard = (event) => {
 
 const deleteCard = (event) => {
   const card = event.target.closest('.card');
-  deleteCardRequest(card).then(card.remove())
+  deleteCardRequest(card).then(() => card.remove())
     .catch(error => console.error('Ошибка: ', error));
 }
 
